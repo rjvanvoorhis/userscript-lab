@@ -1,4 +1,4 @@
-import { sleep } from './sleep';
+import { sleep } from '@core/concurrency/sleep';
 
 export async function throttle<T, R>(
   items: T[],

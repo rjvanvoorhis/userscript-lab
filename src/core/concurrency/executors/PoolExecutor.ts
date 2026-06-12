@@ -1,59 +1,46 @@
-import { Err, Ok, Result } from '@core/result/Result';
-import { Executor } from './Executor';
+import { Err, Ok, type Result } from '@core/result';
+import { generateId } from '@core/utils';
+import type { Executor, TaskId } from '@core/concurrency/executors/Executor';
 
 export class PoolExecutor implements Executor {
-  private readonly queue: Array<() => Promise<void>> = [];
-  private readonly errors: Error[] = [];
+  private readonly queue: Array<() => void> = [];
+  private readonly results = new Map<TaskId, Promise<Result<unknown>>>();
   private running = 0;
-  private pending = 0;
-  private drainResolve: (() => void) | null = null;
 
   constructor(private readonly concurrency: number = 8) {}
 
-  submit(task: () => Promise<void>): void {
-    this.pending++;
+  submit<T>(task: () => Promise<T>): TaskId {
+    const taskId = generateId();
+    let resolve!: (value: Result<unknown>) => void;
+    this.results.set(taskId, new Promise<Result<unknown>>(r => { resolve = r; }));
+
+    const run = () => {
+      this.running++;
+      task()
+        .then(value => resolve(Ok.from(value)))
+        .catch(err => resolve(Err.from(err instanceof Error ? err : new Error(String(err)))))
+        .finally(() => {
+          this.running--;
+          if (this.queue.length > 0) this.queue.shift()!();
+        });
+    };
+
     if (this.running < this.concurrency) {
-      this.run(task);
+      run();
     } else {
-      this.queue.push(task);
+      this.queue.push(run);
     }
+
+    return taskId;
   }
 
-  async drain(): Promise<Result<void>> {
-    if (this.pending === 0) return this.buildResult();
-
-    await new Promise<void>(resolve => {
-      this.drainResolve = resolve;
-    });
-
-    return this.buildResult();
+  async resultFor<T>(taskId: TaskId): Promise<Result<T>> {
+    const promise = this.results.get(taskId);
+    if (!promise) return Err.from<T>(new Error(`Unknown task: ${taskId}`));
+    return promise as Promise<Result<T>>;
   }
 
-  private run(task: () => Promise<void>): void {
-    this.running++;
-    task()
-      .catch(err => this.errors.push(err instanceof Error ? err : new Error(String(err))))
-      .finally(() => {
-        this.running--;
-        this.pending--;
-
-        if (this.queue.length > 0) {
-          this.run(this.queue.shift()!);
-        }
-
-        if (this.pending === 0 && this.drainResolve) {
-          this.drainResolve();
-          this.drainResolve = null;
-        }
-      });
-  }
-
-  private buildResult(): Result<void> {
-    const errors = this.errors.splice(0);
-    if (errors.length > 0) {
-      const msg = errors.map(e => e.message).join('; ');
-      return Err.from(new Error(`executor failed with ${errors.length} error(s): ${msg}`));
-    }
-    return Ok.from(undefined);
+  async drain(): Promise<Result<unknown>[]> {
+    return Promise.all([...this.results.values()]);
   }
 }

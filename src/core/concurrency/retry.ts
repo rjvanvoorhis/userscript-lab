@@ -1,5 +1,5 @@
-import { exponentialBackoff } from './policies/exponential';
-import { sleep } from './sleep';
+import { exponentialBackoff } from '@core/concurrency/policies/exponential';
+import { sleep } from '@core/concurrency/sleep';
 
 export { exponentialBackoff };
 

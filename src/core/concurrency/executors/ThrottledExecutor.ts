@@ -1,41 +1,49 @@
-import { Err, Ok, Result } from '@core/result/Result';
+import { Err, Ok, type Result } from '@core/result';
 import { sleep } from '@core/concurrency/sleep';
-import { Executor } from './Executor';
+import { generateId } from '@core/utils';
+import type { Executor, TaskId } from '@core/concurrency/executors/Executor';
 
 export class ThrottledExecutor implements Executor {
-  private readonly queue: Array<() => Promise<void>> = [];
-  private readonly tasks: Promise<void>[] = [];
-  private readonly errors: Error[] = [];
+  private readonly queue: Array<() => void> = [];
+  private readonly results = new Map<TaskId, Promise<Result<unknown>>>();
   private tokens: number;
   private lastRefill: number;
-  private dispatchLoop: Promise<void> = Promise.resolve();
   private loopRunning = false;
+  private dispatchLoop: Promise<void> = Promise.resolve();
 
   constructor(private readonly perSecond: number = 50) {
     this.tokens = perSecond;
     this.lastRefill = Date.now();
   }
 
-  submit(task: () => Promise<void>): void {
-    this.queue.push(task);
+  submit<T>(task: () => Promise<T>): TaskId {
+    const taskId = generateId();
+    let resolve!: (value: Result<unknown>) => void;
+    this.results.set(taskId, new Promise<Result<unknown>>(r => { resolve = r; }));
+
+    this.queue.push(() => {
+      task()
+        .then(value => resolve(Ok.from(value)))
+        .catch(err => resolve(Err.from(err instanceof Error ? err : new Error(String(err)))));
+    });
+
     if (!this.loopRunning) {
       this.loopRunning = true;
-      this.dispatchLoop = this.runLoop().finally(() => {
-        this.loopRunning = false;
-      });
+      this.dispatchLoop = this.runLoop().finally(() => { this.loopRunning = false; });
     }
+
+    return taskId;
   }
 
-  async drain(): Promise<Result<void>> {
-    await this.dispatchLoop;
-    await Promise.allSettled(this.tasks.splice(0));
+  async resultFor<T>(taskId: TaskId): Promise<Result<T>>{
+    const promise = this.results.get(taskId);
+    if (!promise) return Err.from<T>(new Error(`Unknown task: ${taskId}`));
+    return promise as Promise<Result<T>>;
+  }
 
-    const errors = this.errors.splice(0);
-    if (errors.length > 0) {
-      const msg = errors.map(e => e.message).join('; ');
-      return Err.from(new Error(`executor failed with ${errors.length} error(s): ${msg}`));
-    }
-    return Ok.from(undefined);
+  async drain(): Promise<Result<unknown>[]> {
+    await this.dispatchLoop;
+    return Promise.all([...this.results.values()]);
   }
 
   private refill(): void {
@@ -50,12 +58,7 @@ export class ThrottledExecutor implements Executor {
       this.refill();
       if (this.tokens >= 1) {
         this.tokens -= 1;
-        const task = this.queue.shift()!;
-        this.tasks.push(
-          task().catch(err =>
-            this.errors.push(err instanceof Error ? err : new Error(String(err)))
-          )
-        );
+        this.queue.shift()!();
       } else {
         await sleep(Math.max(1, ((1 - this.tokens) / this.perSecond) * 1000));
       }

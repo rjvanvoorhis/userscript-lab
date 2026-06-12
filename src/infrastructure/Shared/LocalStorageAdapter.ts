@@ -4,7 +4,7 @@
  */
 
 import { createLogger } from '@core/logger'
-import type { StorageContract } from '@application/Shared'
+import type { StorageContract } from '@application/shared'
 
 export class LocalStorageAdapter implements StorageContract {
   private readonly logger = createLogger({ context: 'LocalStorageAdapter' })

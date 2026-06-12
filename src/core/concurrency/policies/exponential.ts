@@ -1,4 +1,4 @@
-import { BackoffPolicy } from './BackoffPolicy';
+import type { BackoffPolicy } from '@core/concurrency/policies/BackoffPolicy';
 
 export const exponentialBackoff =
   ({ base = 1000, max = 8000, jitter = true } = {}): BackoffPolicy =>

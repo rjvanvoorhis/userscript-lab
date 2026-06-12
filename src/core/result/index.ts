@@ -1,1 +1,1 @@
-export * from './Result'
+export * from '@core/result/Result'
