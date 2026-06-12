@@ -1,0 +1,26 @@
+{
+  "name": "userscript-template",
+  "version": "0.1.0",
+  "description": "TypeScript mono repository for userscripts with SOLID and DDD principles",
+  "type": "module",
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "lint": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "userscript",
+    "typescript",
+    "ddd",
+    "solid"
+  ],
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "tsdown": "^0.22.2",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}
