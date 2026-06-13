@@ -1,1 +1,5 @@
 export { StorageContract } from '@application/shared/StorageContract'
+export { NavigatorContract } from '@application/shared/NavigatorContract'
+export { PriceCheckerContract } from '@application/shared/PriceCheckerContract'
+export { ItemBuyerContract } from '@application/shared/ItemBuyerContract'
+export { InventoryContract } from '@application/shared/InventoryContract'

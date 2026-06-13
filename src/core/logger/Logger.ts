@@ -23,7 +23,7 @@ function serializeError(err: Error): SerializedError {
   return {
     name: err.name,
     message: err.message,
-    code: (err as NodeJS.ErrnoException).code,
+    code: (err as { code?: unknown }).code,
     stack: lines[0] ?? '',
     traceback: lines.slice(1, 6).map(s => s.trim()),
   };
@@ -48,25 +48,3 @@ export function createLogger(context: LogContext = {}): Logger {
   };
 }
 
-/** Minimal Lambda context fields needed for logging. */
-export type LambdaLogContext = {
-  awsRequestId?: string;
-  functionName?: string;
-};
-
-/**
- * Create a logger pre-bound with standard Lambda context fields.
- * Pass the Lambda `context` object directly — requestId, functionName,
- * and the X-Ray trace ID are extracted automatically.
- */
-export function createLambdaLogger(
-  lambdaContext: LambdaLogContext = {},
-  extraContext: LogContext = {},
-): Logger {
-  return createLogger({
-    requestId:    lambdaContext.awsRequestId  ?? 'unknown',
-    functionName: lambdaContext.functionName  ?? 'unknown',
-    traceId:      process.env['_X_AMZN_TRACE_ID'] ?? 'unknown',
-    ...extraContext,
-  });
-}

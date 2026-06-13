@@ -1,1 +1,6 @@
-// Shared domain entities and value objects
+export { ItemName } from '@domain/shared/ItemName'
+export { NeoPoint } from '@domain/shared/NeoPoint'
+export type { ItemPrice } from '@domain/shared/ItemPrice'
+export type { ShopListing } from '@domain/shared/ShopListing'
+export type { InventoryEntry } from '@domain/shared/InventoryEntry'
+export type { Competitor } from '@domain/shared/Competitor'

@@ -6,15 +6,15 @@
  */
 
 import { createLogger } from '@core/logger'
-import type { StorageContract } from '@application/Shared'
-import { LocalStorageAdapter } from '@infrastructure/Shared'
+import type { StorageContract } from '@application/shared'
+import { LocalStorageAdapter } from '@infrastructure/shared'
 
 const logger = createLogger({ context: 'ExampleApp' })
 
 /**
  * Initialize the application with its dependencies
  */
-function initializeApp(storage: StorageContract) {
+function initializeApp(_storage: StorageContract) {
   logger.info('Initializing example userscript')
 
   // Your application logic here
