@@ -5,6 +5,7 @@ export type ShopPricerRow = {
   readonly itemName: ItemName;
   readonly onImageClick: (handler: () => void) => void;
   readonly setPriceField: (price: NeoPoint) => void;
+  readonly markUnavailable: () => void;
 };
 
 export interface IShopPricerPage {

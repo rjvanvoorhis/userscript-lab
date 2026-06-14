@@ -13,7 +13,7 @@ export class ShopPricerPageAdapter implements IShopPricerPage {
       if (cells.length < 2) return [];
 
       const nameEl = cells[0].querySelector("b");
-      const imageEl = cells[1].querySelector("input[type='image'], img");
+      const imageEl = cells[1].querySelector<HTMLElement>("input[type='image'], img");
       const priceInput = row.querySelector<HTMLInputElement>(
         "input[name='cost_1']",
       );
@@ -31,9 +31,17 @@ export class ShopPricerPageAdapter implements IShopPricerPage {
       return [
         {
           itemName,
-          onImageClick: (handler) => imageEl.addEventListener("click", handler),
+          onImageClick: (handler) => {
+            imageEl.style.cursor = "pointer";
+            imageEl.addEventListener("click", handler);
+          },
           setPriceField: (price) => {
+            priceInput.style.background = "";
             priceInput.value = price.amount.toString();
+          },
+          markUnavailable: () => {
+            priceInput.style.background = "#ffcccc";
+            priceInput.value = "0";
           },
         } satisfies ShopPricerRow,
       ];

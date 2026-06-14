@@ -16,6 +16,10 @@ export class PriceShopItemsUseCase {
         const result = await this.pricer.getPrice(row.itemName);
         if (result.isErr()) return;
         const marketPrice = result.unwrap().price;
+        if (marketPrice.amount <= UNDERCUT_AMOUNT.amount) {
+          row.markUnavailable();
+          return;
+        }
         row.setPriceField(marketPrice.subtract(UNDERCUT_AMOUNT));
       });
     }
