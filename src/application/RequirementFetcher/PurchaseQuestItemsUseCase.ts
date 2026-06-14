@@ -2,7 +2,7 @@ import type { Result } from '@core/result';
 import { Ok } from '@core/result';
 import { pool } from '@core/concurrency/pool';
 import { NeoPoint } from '@domain/shared/NeoPoint';
-import type { ItemBuyerContract } from '@application/shared/ItemBuyerContract';
+import type { IItemBuyer } from '@application/shared/IItemBuyer';
 import type { QuestRequirement } from '@domain/RequirementFetcher/QuestRequirement';
 import type { ShopListing } from '@domain/shared/ShopListing';
 
@@ -13,7 +13,7 @@ export type PurchaseResult = {
 
 export class PurchaseQuestItemsUseCase {
   constructor(
-    private readonly buyer: ItemBuyerContract,
+    private readonly buyer: IItemBuyer,
     private readonly maxPriceMultiplier: number = 1.2,
   ) {}
 

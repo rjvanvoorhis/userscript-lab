@@ -24,3 +24,4 @@ export const HISTORICAL_PRICE_API_BASE = 'https://raw.githubusercontent.com/Unov
 // ---------------------------------------------------------------------------
 
 export const BET_HISTORY_STORAGE_KEY = 'neopets:betForecast:history';
+export const HISTORICAL_PRICE_CACHE_KEY = 'neopets:restocker:priceSnapshot';

@@ -1,12 +1,12 @@
 /**
  * LocalStorageAdapter
- * Implements the StorageContract using browser's localStorage.
+ * Implements the IStorage interface using browser's localStorage.
  */
 
 import { createLogger } from '@core/logger'
-import type { StorageContract } from '@application/shared/StorageContract'
+import type { IStorage } from '@application/shared/IStorage'
 
-export class LocalStorageAdapter implements StorageContract {
+export class LocalStorageAdapter implements IStorage {
   private readonly logger = createLogger({ context: 'LocalStorageAdapter' })
 
   async get(key: string): Promise<unknown> {

@@ -1,6 +1,6 @@
 import type { Result } from '@core/result';
 import { Ok } from '@core/result';
-import type { InventoryContract } from '@application/shared/InventoryContract';
+import type { IInventory } from '@application/shared/IInventory';
 
 export type SDBReport = {
   readonly totalItems: number;
@@ -9,7 +9,7 @@ export type SDBReport = {
 };
 
 export class GenerateSDBReportUseCase {
-  constructor(private readonly inventory: InventoryContract) {}
+  constructor(private readonly inventory: IInventory) {}
 
   async execute(): Promise<Result<SDBReport>> {
     const result = await this.inventory.listAll();

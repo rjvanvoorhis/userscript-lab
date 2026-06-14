@@ -1,10 +1,10 @@
 import type { Result } from '@core/result';
 import { Ok } from '@core/result';
 import { pool } from '@core/concurrency/pool';
-import type { NavigatorContract } from '@application/shared/NavigatorContract';
-import type { PriceCheckerContract } from '@application/shared/PriceCheckerContract';
-import type { RestockShopScraperContract } from '@application/Restocker/RestockShopScraperContract';
-import type { RestockBuyerContract } from '@application/Restocker/RestockBuyerContract';
+import type { INavigator } from '@application/shared/INavigator';
+import type { IPriceChecker } from '@application/shared/IPriceChecker';
+import type { IRestockShopScraper } from '@application/Restocker/IRestockShopScraper';
+import type { IRestockBuyer } from '@application/Restocker/IRestockBuyer';
 import type { RestockOpportunity } from '@domain/Restocker/RestockOpportunity';
 import type { NeoPoint } from '@domain/shared/NeoPoint';
 
@@ -15,10 +15,10 @@ export type ScanConfig = {
 
 export class ScanRestockShopUseCase {
   constructor(
-    private readonly navigator: NavigatorContract,
-    private readonly scraper: RestockShopScraperContract,
-    private readonly pricer: PriceCheckerContract,
-    private readonly buyer: RestockBuyerContract,
+    private readonly navigator: INavigator,
+    private readonly scraper: IRestockShopScraper,
+    private readonly pricer: IPriceChecker,
+    private readonly buyer: IRestockBuyer,
   ) {}
 
   async execute(config: ScanConfig): Promise<Result<RestockOpportunity[]>> {

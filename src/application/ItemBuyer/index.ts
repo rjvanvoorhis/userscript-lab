@@ -1,3 +1,3 @@
-export { ShopListingSourceContract } from '@application/ItemBuyer/ShopListingSourceContract'
-export { ShopPurchaserContract } from '@application/ItemBuyer/ShopPurchaserContract'
+export { IShopListingSource } from '@application/ItemBuyer/IShopListingSource'
+export { IShopPurchaser } from '@application/ItemBuyer/IShopPurchaser'
 export { BuyItemUseCase } from '@application/ItemBuyer/BuyItemUseCase'

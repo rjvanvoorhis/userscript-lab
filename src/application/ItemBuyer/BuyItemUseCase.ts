@@ -1,17 +1,17 @@
 import type { Result } from '@core/result';
 import { Ok, Err } from '@core/result';
-import type { ItemBuyerContract } from '@application/shared/ItemBuyerContract';
-import type { ShopListingSourceContract } from '@application/ItemBuyer/ShopListingSourceContract';
-import type { ShopPurchaserContract } from '@application/ItemBuyer/ShopPurchaserContract';
+import type { IItemBuyer } from '@application/shared/IItemBuyer';
+import type { IShopListingSource } from '@application/ItemBuyer/IShopListingSource';
+import type { IShopPurchaser } from '@application/ItemBuyer/IShopPurchaser';
 import type { ItemName } from '@domain/shared/ItemName';
 import type { NeoPoint } from '@domain/shared/NeoPoint';
 import type { ShopListing } from '@domain/shared/ShopListing';
 import type { PurchaseAttempt } from '@domain/ItemBuyer/PurchaseAttempt';
 
-export class BuyItemUseCase implements ItemBuyerContract {
+export class BuyItemUseCase implements IItemBuyer {
   constructor(
-    private readonly source: ShopListingSourceContract,
-    private readonly purchaser: ShopPurchaserContract,
+    private readonly source: IShopListingSource,
+    private readonly purchaser: IShopPurchaser,
   ) {}
 
   async buyItem(itemName: ItemName, maxPrice: NeoPoint): Promise<Result<ShopListing>> {

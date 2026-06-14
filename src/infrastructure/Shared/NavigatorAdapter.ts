@@ -1,8 +1,8 @@
 import { attemptAsync } from '@core/result';
 import type { Result } from '@core/result';
-import type { NavigatorContract } from '@application/shared/NavigatorContract';
+import type { INavigator } from '@application/shared/INavigator';
 
-export class NavigatorAdapter implements NavigatorContract {
+export class NavigatorAdapter implements INavigator {
   async fetchDocument(url: string): Promise<Result<Document>> {
     return attemptAsync(async () => {
       const response = await fetch(url, { credentials: 'include' });

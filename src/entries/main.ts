@@ -2,6 +2,7 @@ import { createLogger } from '@core/logger';
 import { NeoPoint } from '@domain/shared/NeoPoint';
 import { NavigatorAdapter } from '@infrastructure/shared/NavigatorAdapter';
 import { HistoricalPriceAdapter } from '@infrastructure/PriceChecker/HistoricalPriceAdapter';
+import type { Snapshot } from '@infrastructure/PriceChecker/HistoricalPriceAdapter';
 import { ShopWizardPriceAdapter } from '@infrastructure/PriceChecker/ShopWizardPriceAdapter';
 import { GetItemPriceUseCase } from '@application/PriceChecker/GetItemPriceUseCase';
 import { ShopWizardAdapter } from '@infrastructure/ItemBuyer/ShopWizardAdapter';
@@ -14,8 +15,14 @@ import { FetchQuestRequirementsUseCase } from '@application/RequirementFetcher/F
 import { PurchaseQuestItemsUseCase } from '@application/RequirementFetcher/PurchaseQuestItemsUseCase';
 import { RestockShopScraper } from '@infrastructure/Restocker/RestockShopScraper';
 import { RestockBuyAdapter } from '@infrastructure/Restocker/RestockBuyAdapter';
+import { RestockPanelAdapter } from '@infrastructure/Restocker/RestockPanelAdapter';
 import { ScanRestockShopUseCase } from '@application/Restocker/ScanRestockShopUseCase';
-import { RestockBackoffUseCase } from '@application/Restocker/RestockBackoffUseCase';
+import { RestockPageController } from '@application/Restocker/RestockPageController';
+import { NPCShopBuyerAdapter } from '@infrastructure/ItemBuyer/NPCShopBuyerAdapter';
+import { DocumentServiceAdapter } from '@infrastructure/shared/DocumentServiceAdapter';
+import { UrlMapCaptchaSolver } from '@infrastructure/ItemBuyer/CaptchaSolver/UrlMapCaptchaSolver';
+import { LocalStorageAdapter } from '@infrastructure/shared/LocalStorageAdapter';
+import { HISTORICAL_PRICE_CACHE_KEY } from '@core/constants';
 import { GenerateSDBReportUseCase } from '@application/SDBManager/GenerateSDBReportUseCase';
 import { BetPageScraper } from '@infrastructure/BetForecast/BetPageScraper';
 import { BetSubmitterAdapter } from '@infrastructure/BetForecast/BetSubmitterAdapter';
@@ -26,13 +33,13 @@ import { PlaceOptimalBetsUseCase } from '@application/BetForecast/PlaceOptimalBe
 const logger = createLogger({ context: 'main' });
 
 function main() {
-  const url = window.location.href;
+  const url = globalThis.location.href;
 
   // --- Shared infrastructure ---
   const navigator = new NavigatorAdapter();
 
   // --- Shared application services ---
-  const historical = new HistoricalPriceAdapter();
+  const historical = new HistoricalPriceAdapter({});
   const livePrice = new ShopWizardPriceAdapter();
   const priceChecker = new GetItemPriceUseCase(historical, livePrice);
 
@@ -44,7 +51,7 @@ function main() {
   const sdbManager = new SDBManager(sdbScraper, navigator);
 
   // --- URL routing ---
-  const routes: Array<{ pattern: RegExp; activate: () => void }> = [
+  const routes: Array<{ pattern: RegExp; activate: () => Promise<void> }> = [
     {
       pattern: /quests\.phtml|faeriequestcorner/,
       activate: () => activateRequirementFetcher(),
@@ -66,55 +73,77 @@ function main() {
   const matched = routes.find(r => r.pattern.test(url));
   if (matched) {
     logger.info('Activating feature', { url });
-    matched.activate();
+    matched.activate().catch(err => logger.error('Feature activation failed', err));
   }
 
   // --- Feature activators ---
 
-  function activateRequirementFetcher() {
+  async function activateRequirementFetcher() {
     const questScraper = new QuestPageScraper();
     const fetchUseCase = new FetchQuestRequirementsUseCase(navigator, questScraper, sdbManager, priceChecker);
     const purchaseUseCase = new PurchaseQuestItemsUseCase(itemBuyer);
 
-    fetchUseCase.execute().then(result => result.match({
+    const result = await fetchUseCase.execute();
+    result.match({
       err: err => logger.error('Failed to fetch quest requirements', err),
       ok: requirements => renderRequirementsPanel(requirements, () => purchaseUseCase.execute(requirements)),
-    }));
-  }
-
-  function activateRestocker() {
-    const shopScraper = new RestockShopScraper();
-    const buyAdapter = new RestockBuyAdapter();
-    const scanUseCase = new ScanRestockShopUseCase(navigator, shopScraper, priceChecker, buyAdapter);
-    const backoffUseCase = new RestockBackoffUseCase(scanUseCase);
-
-    backoffUseCase.execute(
-      { profitThreshold: NeoPoint.from(1000) },
-      { maxCycles: 10 },
-    ).then(opportunities => {
-      logger.info('Restock cycle complete', { opportunities: opportunities.length });
     });
   }
 
-  function activateSDBManager() {
-    const reportUseCase = new GenerateSDBReportUseCase(sdbManager);
-    sdbManager.loadSDB().then(() =>
-      reportUseCase.execute().then(result => {
-        if (result.isOK()) renderSDBReport(result.unwrap());
-      }),
-    );
+  async function activateRestocker() {
+    const storage = new LocalStorageAdapter();
+
+    const cached = await storage.get(HISTORICAL_PRICE_CACHE_KEY) as Snapshot | null;
+    let snapshot: Snapshot;
+    if (cached) {
+      snapshot = cached;
+    } else {
+      snapshot = await HistoricalPriceAdapter.fetchSnapshot();
+      await storage.set(HISTORICAL_PRICE_CACHE_KEY, snapshot);
+    }
+    const historicalPricer = HistoricalPriceAdapter.fromSnapshot(snapshot);
+
+    const documentService = new DocumentServiceAdapter();
+    const captchaSolver = new UrlMapCaptchaSolver({});
+    const npcBuyer = new NPCShopBuyerAdapter(captchaSolver, documentService);
+    const shopScraper = new RestockShopScraper();
+    const buyAdapter = new RestockBuyAdapter(npcBuyer);
+    const scanUseCase = new ScanRestockShopUseCase(navigator, shopScraper, historicalPricer, buyAdapter);
+    const panel = new RestockPanelAdapter();
+    const controller = new RestockPageController(panel, scanUseCase, navigator, storage, {});
+
+    panel.onRefreshPrices(async () => {
+      await storage.remove(HISTORICAL_PRICE_CACHE_KEY);
+      const fresh = await HistoricalPriceAdapter.fetchSnapshot();
+      await storage.set(HISTORICAL_PRICE_CACHE_KEY, fresh);
+      await navigator.navigateTo(globalThis.location.href);
+    });
+
+    await controller.start({
+      autobuyEnabled: false,
+      autorefreshEnabled: false,
+      refreshFrequencyMs: 5000,
+      shopId: '',
+      minProfitMargin: NeoPoint.from(1000),
+    });
   }
 
-  function activateBetForecast() {
+  async function activateSDBManager() {
+    const reportUseCase = new GenerateSDBReportUseCase(sdbManager);
+    await sdbManager.loadSDB();
+    const result = await reportUseCase.execute();
+    if (result.isOK()) renderSDBReport(result.unwrap());
+  }
+
+  async function activateBetForecast() {
     const betScraper = new BetPageScraper(navigator);
     const betRecords = new BetRecordAdapter();
     const advisor = new LocalBetAdvisor(betScraper, betRecords);
     const betSubmitter = new BetSubmitterAdapter();
     const placeUseCase = new PlaceOptimalBetsUseCase(advisor, betSubmitter);
 
-    placeUseCase.execute().then(result => {
-      if (result.isErr()) logger.error('Bet placement failed');
-    });
+    const result = await placeUseCase.execute();
+    if (result.isErr()) logger.error('Bet placement failed');
   }
 }
 

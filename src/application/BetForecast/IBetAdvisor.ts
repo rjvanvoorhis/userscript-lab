@@ -6,6 +6,6 @@ export type BetRecommendation = {
   readonly amount: NeoPoint;
 };
 
-export interface BetAdvisorContract {
+export interface IBetAdvisor {
   getRecommendations(): Promise<Result<BetRecommendation[]>>;
 }

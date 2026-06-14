@@ -1,8 +1,8 @@
 import type { Result } from '@core/result';
 import { Ok } from '@core/result';
 import { SAFETY_DEPOSIT_BOX_URL } from '@core/constants';
-import type { InventoryContract } from '@application/shared/InventoryContract';
-import type { NavigatorContract } from '@application/shared/NavigatorContract';
+import type { IInventory } from '@application/shared/IInventory';
+import type { INavigator } from '@application/shared/INavigator';
 import type { ItemName } from '@domain/shared/ItemName';
 import type { InventoryEntry } from '@domain/shared/InventoryEntry';
 
@@ -10,13 +10,13 @@ export interface SDBPageScraperContract {
   scrapeEntries(doc: Document): InventoryEntry[];
 }
 
-export class SDBManager implements InventoryContract {
+export class SDBManager implements IInventory {
   private cache: InventoryEntry[] = [];
   private loaded = false;
 
   constructor(
     private readonly scraper: SDBPageScraperContract,
-    private readonly navigator: NavigatorContract,
+    private readonly navigator: INavigator,
     private readonly sdbUrl: string = SAFETY_DEPOSIT_BOX_URL,
   ) {}
 

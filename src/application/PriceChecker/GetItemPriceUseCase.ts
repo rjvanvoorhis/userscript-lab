@@ -1,12 +1,12 @@
 import type { Result } from '@core/result';
-import type { PriceCheckerContract } from '@application/shared/PriceCheckerContract';
+import type { IPriceChecker } from '@application/shared/IPriceChecker';
 import type { ItemName } from '@domain/shared/ItemName';
 import type { ItemPrice } from '@domain/shared/ItemPrice';
 
-export class GetItemPriceUseCase implements PriceCheckerContract {
+export class GetItemPriceUseCase implements IPriceChecker {
   constructor(
-    private readonly historical: PriceCheckerContract,
-    private readonly live: PriceCheckerContract,
+    private readonly historical: IPriceChecker,
+    private readonly live: IPriceChecker,
   ) {}
 
   async getPrice(itemName: ItemName): Promise<Result<ItemPrice>> {

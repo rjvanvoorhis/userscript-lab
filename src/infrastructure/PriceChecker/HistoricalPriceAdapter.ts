@@ -1,27 +1,30 @@
 import { Ok, type Result } from '@core/result';
-import type { PriceCheckerContract } from '@application/shared/PriceCheckerContract';
+import type { IPriceChecker } from '@application/shared/IPriceChecker';
 import { ItemName } from '@domain/shared/ItemName';
 import type { ItemPrice } from '@domain/shared/ItemPrice';
 import { NeoPoint } from '@domain/shared';
 import { HISTORICAL_PRICE_API_BASE } from '@core/constants';
 
-type SnapshotItem = {
+export type SnapshotItem = {
   ImgURL: string;
   Price: string | null;
   LastPrice: string | null;
 }
 
-type Snapshot = Record<string, SnapshotItem>;
+export type Snapshot = Record<string, SnapshotItem>;
 type ItemData = Record<string, number>;
 
-export class HistoricalPriceAdapter implements PriceCheckerContract {
+export class HistoricalPriceAdapter implements IPriceChecker {
 
   constructor (private _data: ItemData){}
 
-  static async fromUrl(url: string = HISTORICAL_PRICE_API_BASE) {
+  static async fetchSnapshot(url: string = HISTORICAL_PRICE_API_BASE): Promise<Snapshot> {
     const result = await fetch(url);
-    const snapshot = await result.json();
-    return HistoricalPriceAdapter.fromSnapshot(snapshot);
+    return result.json();
+  }
+
+  static async fromUrl(url: string = HISTORICAL_PRICE_API_BASE) {
+    return HistoricalPriceAdapter.fromSnapshot(await HistoricalPriceAdapter.fetchSnapshot(url));
   }
 
   static fromSnapshot(snapshot: Snapshot){

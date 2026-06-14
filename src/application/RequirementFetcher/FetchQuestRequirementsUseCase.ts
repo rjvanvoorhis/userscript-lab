@@ -1,8 +1,8 @@
 import type { Result } from '@core/result';
 import { Ok } from '@core/result';
-import type { NavigatorContract } from '@application/shared/NavigatorContract';
-import type { PriceCheckerContract } from '@application/shared/PriceCheckerContract';
-import type { InventoryContract } from '@application/shared/InventoryContract';
+import type { INavigator } from '@application/shared/INavigator';
+import type { IPriceChecker } from '@application/shared/IPriceChecker';
+import type { IInventory } from '@application/shared/IInventory';
 import type { QuestRequirement } from '@domain/RequirementFetcher/QuestRequirement';
 import type { ItemName } from '@domain/shared/ItemName';
 
@@ -12,10 +12,10 @@ export interface QuestPageScraperContract {
 
 export class FetchQuestRequirementsUseCase {
   constructor(
-    private readonly navigator: NavigatorContract,
+    private readonly navigator: INavigator,
     private readonly scraper: QuestPageScraperContract,
-    private readonly inventory: InventoryContract,
-    private readonly pricer: PriceCheckerContract,
+    private readonly inventory: IInventory,
+    private readonly pricer: IPriceChecker,
   ) {}
 
   async execute(): Promise<Result<QuestRequirement[]>> {

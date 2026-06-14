@@ -1,6 +1,6 @@
 import { Ok } from '@core/result';
 import type { Result } from '@core/result';
-import type { BetAdvisorContract, BetRecommendation } from '@application/BetForecast/BetAdvisorContract';
+import type { IBetAdvisor, BetRecommendation } from '@application/BetForecast/IBetAdvisor';
 import type { Competitor } from '@domain/shared/Competitor';
 import { NeoPoint } from '@domain/shared/NeoPoint';
 import type { BetOutcome } from '@domain/BetForecast/BetOutcome';
@@ -10,7 +10,7 @@ import type { BetRecordAdapter } from '@infrastructure/BetForecast/BetRecordAdap
 const MIN_ROI_THRESHOLD = 0.05;
 const DEFAULT_BET_AMOUNT = NeoPoint.from(50);
 
-export class LocalBetAdvisor implements BetAdvisorContract {
+export class LocalBetAdvisor implements IBetAdvisor {
   constructor(
     private readonly scraper: BetPageScraper,
     private readonly records: BetRecordAdapter,

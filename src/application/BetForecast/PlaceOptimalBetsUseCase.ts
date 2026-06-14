@@ -1,11 +1,11 @@
 import type { Result } from '@core/result';
-import type { BetAdvisorContract } from '@application/BetForecast/BetAdvisorContract';
-import type { BetSubmitterContract } from '@application/BetForecast/BetSubmitterContract';
+import type { IBetAdvisor } from '@application/BetForecast/IBetAdvisor';
+import type { IBetSubmitter } from '@application/BetForecast/IBetSubmitter';
 
 export class PlaceOptimalBetsUseCase {
   constructor(
-    private readonly advisor: BetAdvisorContract,
-    private readonly submitter: BetSubmitterContract,
+    private readonly advisor: IBetAdvisor,
+    private readonly submitter: IBetSubmitter,
   ) {}
 
   async execute(): Promise<Result<void>> {

@@ -1,10 +1,10 @@
 /**
- * StorageContract
+ * IStorage
  * Defines the interface for storage adapters.
  * Any storage implementation (localStorage, IndexedDB, etc.) must implement this contract.
  */
 
-export interface StorageContract {
+export interface IStorage {
   /**
    * Get a value from storage
    * @param key The storage key
