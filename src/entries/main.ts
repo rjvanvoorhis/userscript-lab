@@ -29,6 +29,8 @@ import { BetSubmitterAdapter } from '@infrastructure/BetForecast/BetSubmitterAda
 import { BetRecordAdapter } from '@infrastructure/BetForecast/BetRecordAdapter';
 import { LocalBetAdvisor } from '@infrastructure/BetForecast/LocalBetAdvisor';
 import { PlaceOptimalBetsUseCase } from '@application/BetForecast/PlaceOptimalBetsUseCase';
+import { ShopPricerPageAdapter } from '@infrastructure/ShopPricer/ShopPricerPageAdapter';
+import { PriceShopItemsUseCase } from '@application/ShopPricer/PriceShopItemsUseCase';
 
 const logger = createLogger({ context: 'main' });
 
@@ -51,26 +53,34 @@ function main() {
   const sdbManager = new SDBManager(sdbScraper, navigator);
 
   // --- URL routing ---
-  const routes: Array<{ pattern: RegExp; activate: () => Promise<void> }> = [
+  const parsed = new URL(url);
+  const path = parsed.pathname;
+  const param = (k: string) => parsed.searchParams.get(k);
+
+  const routes: Array<{ match: () => boolean; activate: () => Promise<void> }> = [
     {
-      pattern: /quests\.phtml|faeriequestcorner/,
+      match: () => /quests\.phtml|faeriequestcorner/.test(path),
       activate: () => activateRequirementFetcher(),
     },
     {
-      pattern: /npcshops\.phtml|bargainshop\.phtml|mall\/shop\.phtml/,
+      match: () => path.endsWith('objects.phtml') && param('type') === 'shop',
       activate: () => activateRestocker(),
     },
     {
-      pattern: /safetydeposit\.phtml/,
+      match: () => path.endsWith('market.phtml') && param('type') === 'your',
+      activate: () => activateShopPricer(),
+    },
+    {
+      match: () => path.endsWith('safetydeposit.phtml'),
       activate: () => activateSDBManager(),
     },
     {
-      pattern: /medieval\/foodclub\.phtml/,
+      match: () => path.endsWith('foodclub.phtml'),
       activate: () => activateBetForecast(),
     },
   ];
 
-  const matched = routes.find(r => r.pattern.test(url));
+  const matched = routes.find(r => r.match());
   if (matched) {
     logger.info('Activating feature', { url });
     matched.activate().catch(err => logger.error('Feature activation failed', err));
@@ -133,6 +143,11 @@ function main() {
     await sdbManager.loadSDB();
     const result = await reportUseCase.execute();
     if (result.isOK()) renderSDBReport(result.unwrap());
+  }
+
+  async function activateShopPricer() {
+    const page = new ShopPricerPageAdapter();
+    new PriceShopItemsUseCase(page, priceChecker).execute();
   }
 
   async function activateBetForecast() {
