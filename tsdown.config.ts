@@ -2,7 +2,7 @@ import { defineConfig } from 'tsdown'
 import { resolve } from 'node:path'
 
 export default defineConfig({
-  entry: ['src/entries/*.ts'],
+  entry: ['src/entries/main.ts'],
   outDir: 'dist',
   format: 'iife',
   clean: true,
