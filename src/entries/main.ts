@@ -2,10 +2,10 @@ import { createLogger } from '@core/logger';
 import { NeoPoint } from '@domain/shared/NeoPoint';
 import { NavigatorAdapter } from '@infrastructure/shared/NavigatorAdapter';
 import { HistoricalPriceAdapter } from '@infrastructure/PriceChecker/HistoricalPriceAdapter';
-import { LiveScraperAdapter } from '@infrastructure/PriceChecker/LiveScraperAdapter';
+import { ShopWizardPriceAdapter } from '@infrastructure/PriceChecker/ShopWizardPriceAdapter';
 import { GetItemPriceUseCase } from '@application/PriceChecker/GetItemPriceUseCase';
 import { ShopWizardAdapter } from '@infrastructure/ItemBuyer/ShopWizardAdapter';
-import { ShopNavigatorAdapter } from '@infrastructure/ItemBuyer/ShopNavigatorAdapter';
+import { UserShopBuyerAdapter } from '@infrastructure/ItemBuyer/UserShopBuyerAdapter';
 import { BuyItemUseCase } from '@application/ItemBuyer/BuyItemUseCase';
 import { SDBPageScraper } from '@infrastructure/SDBManager/SDBPageScraper';
 import { SDBManager } from '@application/SDBManager/SDBManager';
@@ -33,11 +33,11 @@ function main() {
 
   // --- Shared application services ---
   const historical = new HistoricalPriceAdapter();
-  const livePrice = new LiveScraperAdapter();
+  const livePrice = new ShopWizardPriceAdapter();
   const priceChecker = new GetItemPriceUseCase(historical, livePrice);
 
   const shopWizard = new ShopWizardAdapter();
-  const shopPurchaser = new ShopNavigatorAdapter();
+  const shopPurchaser = new UserShopBuyerAdapter();
   const itemBuyer = new BuyItemUseCase(shopWizard, shopPurchaser);
 
   const sdbScraper = new SDBPageScraper();

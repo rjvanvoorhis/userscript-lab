@@ -1,2 +1,2 @@
 export { ShopWizardAdapter } from '@infrastructure/ItemBuyer/ShopWizardAdapter'
-export { ShopNavigatorAdapter } from '@infrastructure/ItemBuyer/ShopNavigatorAdapter'
+export { UserShopBuyerAdapter as ShopNavigatorAdapter } from '@infrastructure/ItemBuyer/UserShopBuyerAdapter'

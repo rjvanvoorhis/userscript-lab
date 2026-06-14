@@ -3,7 +3,7 @@ import type { ShopPurchaserContract } from '@application/ItemBuyer/ShopPurchaser
 import type { ShopListing } from '@domain/shared/ShopListing';
 import type { PurchaseAttempt } from '@domain/ItemBuyer/PurchaseAttempt';
 
-export class ShopNavigatorAdapter implements ShopPurchaserContract {
+export class UserShopBuyerAdapter implements ShopPurchaserContract {
   purchase(_listing: ShopListing): Promise<Result<PurchaseAttempt>> {
     throw new Error('Not implemented');
   }
