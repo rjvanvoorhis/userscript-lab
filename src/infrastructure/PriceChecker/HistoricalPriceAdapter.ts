@@ -12,7 +12,7 @@ export type SnapshotItem = {
 }
 
 export type Snapshot = Record<string, SnapshotItem>;
-type ItemData = Record<string, number>;
+export type ItemData = Record<string, number>;
 
 export class HistoricalPriceAdapter implements IPriceChecker {
 
@@ -27,9 +27,22 @@ export class HistoricalPriceAdapter implements IPriceChecker {
     return HistoricalPriceAdapter.fromSnapshot(await HistoricalPriceAdapter.fetchSnapshot(url));
   }
 
-  static fromSnapshot(snapshot: Snapshot){
-      const data: ItemData = Object.fromEntries(Object.entries(snapshot).map(([key, value]) => ([key, Number.parseInt(value.Price || value.LastPrice || "0")])));
-      return new HistoricalPriceAdapter(data);
+  static fromSnapshot(snapshot: Snapshot): HistoricalPriceAdapter {
+    const data: ItemData = Object.fromEntries(
+      Object.entries(snapshot).map(([key, value]) => [
+        key,
+        Number.parseInt(value.Price || value.LastPrice || "0"),
+      ]),
+    );
+    return new HistoricalPriceAdapter(data);
+  }
+
+  static fromData(data: ItemData): HistoricalPriceAdapter {
+    return new HistoricalPriceAdapter(data);
+  }
+
+  getData(): ItemData {
+    return this._data;
   }
 
   async getPrice(itemName: ItemName): Promise<Result<ItemPrice>> {

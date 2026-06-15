@@ -2,7 +2,6 @@ import { createLogger } from '@core/logger';
 import { NeoPoint } from '@domain/shared/NeoPoint';
 import { NavigatorAdapter } from '@infrastructure/shared/NavigatorAdapter';
 import { HistoricalPriceAdapter } from '@infrastructure/PriceChecker/HistoricalPriceAdapter';
-import type { Snapshot } from '@infrastructure/PriceChecker/HistoricalPriceAdapter';
 import { ShopWizardPriceAdapter } from '@infrastructure/PriceChecker/ShopWizardPriceAdapter';
 import { GetItemPriceUseCase } from '@application/PriceChecker/GetItemPriceUseCase';
 import { ShopWizardAdapter } from '@infrastructure/ItemBuyer/ShopWizardAdapter';
@@ -103,15 +102,15 @@ function main() {
   async function activateRestocker() {
     const storage = new LocalStorageAdapter();
 
-    const cached = await storage.get(HISTORICAL_PRICE_CACHE_KEY) as Snapshot | null;
-    let snapshot: Snapshot;
+    const cached = await storage.get(HISTORICAL_PRICE_CACHE_KEY);
+    let historicalPricer: HistoricalPriceAdapter;
     if (cached) {
-      snapshot = cached;
+      historicalPricer = HistoricalPriceAdapter.fromData(cached as Record<string, number>);
     } else {
-      snapshot = await HistoricalPriceAdapter.fetchSnapshot();
-      await storage.set(HISTORICAL_PRICE_CACHE_KEY, snapshot);
+      const snapshot = await HistoricalPriceAdapter.fetchSnapshot();
+      historicalPricer = HistoricalPriceAdapter.fromSnapshot(snapshot);
+      await storage.set(HISTORICAL_PRICE_CACHE_KEY, historicalPricer.getData());
     }
-    const historicalPricer = HistoricalPriceAdapter.fromSnapshot(snapshot);
 
     const documentService = new DocumentServiceAdapter();
     const captchaSolver = new UrlMapCaptchaSolver({});
@@ -125,7 +124,8 @@ function main() {
     panel.onRefreshPrices(async () => {
       await storage.remove(HISTORICAL_PRICE_CACHE_KEY);
       const fresh = await HistoricalPriceAdapter.fetchSnapshot();
-      await storage.set(HISTORICAL_PRICE_CACHE_KEY, fresh);
+      const freshPricer = HistoricalPriceAdapter.fromSnapshot(fresh);
+      await storage.set(HISTORICAL_PRICE_CACHE_KEY, freshPricer.getData());
       await navigator.navigateTo(globalThis.location.href);
     });
 
