@@ -12,7 +12,11 @@ export class ShopWizardPriceAdapter implements IPriceChecker {
         url.searchParams.append("q", itemName.value);
         url.searchParams.append("json", "1");
         const result = await fetch(url);
-        const data = await result.json();
+        const text = await result.text();
+        if (text.includes('not allowed to')) {
+          throw new Error(`SSW search not allowed for "${itemName.value}"`);
+        }
+        const data = JSON.parse(text);
         return {
           itemName,
           price: NeoPoint.from(Number.parseInt(data.data.prices[0] || "0"))

@@ -4,6 +4,8 @@ import { NavigatorAdapter } from '@infrastructure/shared/NavigatorAdapter';
 import { LocalStorageAdapter } from '@infrastructure/shared/LocalStorageAdapter';
 import { HistoricalPriceAdapter } from '@infrastructure/PriceChecker/HistoricalPriceAdapter';
 import { ShopWizardPriceAdapter } from '@infrastructure/PriceChecker/ShopWizardPriceAdapter';
+import { LegacyShopWizardAdapter } from '@infrastructure/PriceChecker/LegacyShopWizardAdapter';
+import { LivePriceAdapter } from '@infrastructure/PriceChecker/LivePriceAdapter';
 import { GetItemPriceUseCase } from '@application/PriceChecker/GetItemPriceUseCase';
 import { ShopWizardAdapter } from '@infrastructure/ItemBuyer/ShopWizardAdapter';
 import { UserShopBuyerAdapter } from '@infrastructure/ItemBuyer/UserShopBuyerAdapter';
@@ -47,7 +49,7 @@ async function activateRequirementFetcher() {
     nav,
     new QuestPageScraper(),
     new SDBManager(new SDBPageScraper(), nav),
-    new GetItemPriceUseCase(new HistoricalPriceAdapter({}), new ShopWizardPriceAdapter()),
+    new GetItemPriceUseCase(new HistoricalPriceAdapter({}), new LivePriceAdapter(new ShopWizardPriceAdapter(), new LegacyShopWizardAdapter())),
     new BuyItemUseCase(new ShopWizardAdapter(), new UserShopBuyerAdapter()),
   );
   await new QuestController(useCase).start();
@@ -72,7 +74,7 @@ async function activateRestocker(param: (k: string) => string | null) {
 async function activateShopPricer() {
   const useCase = new PriceShopItemsUseCase(
     new ShopPricerPageAdapter(),
-    new ShopWizardPriceAdapter(),
+    new LivePriceAdapter(new ShopWizardPriceAdapter(), new LegacyShopWizardAdapter()),
   );
   await new ShopPricerController(useCase).start();
 }

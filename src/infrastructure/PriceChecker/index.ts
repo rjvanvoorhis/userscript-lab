@@ -1,2 +1,4 @@
 export { HistoricalPriceAdapter } from '@infrastructure/PriceChecker/HistoricalPriceAdapter'
-export { ShopWizardPriceAdapter as LiveScraperAdapter } from '@infrastructure/PriceChecker/ShopWizardPriceAdapter'
+export { ShopWizardPriceAdapter } from '@infrastructure/PriceChecker/ShopWizardPriceAdapter'
+export { LegacyShopWizardAdapter } from '@infrastructure/PriceChecker/LegacyShopWizardAdapter'
+export { LivePriceAdapter } from '@infrastructure/PriceChecker/LivePriceAdapter'
