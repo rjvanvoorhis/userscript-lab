@@ -22,6 +22,7 @@ import { DocumentServiceAdapter } from '@infrastructure/shared/DocumentServiceAd
 import { UrlMapCaptchaSolver } from '@infrastructure/ItemBuyer/CaptchaSolver/UrlMapCaptchaSolver';
 import { LocalStorageAdapter } from '@infrastructure/shared/LocalStorageAdapter';
 import { HISTORICAL_PRICE_CACHE_KEY } from '@core/constants';
+import { NEOPETS_SHOPS } from '@core/shops';
 import { GenerateSDBReportUseCase } from '@application/SDBManager/GenerateSDBReportUseCase';
 import { BetPageScraper } from '@infrastructure/BetForecast/BetPageScraper';
 import { BetSubmitterAdapter } from '@infrastructure/BetForecast/BetSubmitterAdapter';
@@ -119,7 +120,7 @@ function main() {
     const buyAdapter = new RestockBuyAdapter(npcBuyer);
     const scanUseCase = new ScanRestockShopUseCase(navigator, shopScraper, historicalPricer, buyAdapter);
     const panel = new RestockPanelAdapter();
-    const controller = new RestockPageController(panel, scanUseCase, navigator, storage, {});
+    const controller = new RestockPageController(panel, scanUseCase, navigator, storage, NEOPETS_SHOPS);
 
     panel.onRefreshPrices(async () => {
       await storage.remove(HISTORICAL_PRICE_CACHE_KEY);

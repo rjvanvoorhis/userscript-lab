@@ -13,6 +13,16 @@ export type ScanConfig = {
   readonly concurrency?: number;
 };
 
+export type BestItem = {
+  readonly name: string;
+  readonly profitAmount: number;
+};
+
+export type ScanResult = {
+  readonly opportunities: RestockOpportunity[];
+  readonly bestItem: BestItem | null;
+};
+
 export class ScanRestockShopUseCase {
   constructor(
     private readonly navigator: INavigator,
@@ -21,36 +31,46 @@ export class ScanRestockShopUseCase {
     private readonly buyer: IRestockBuyer,
   ) {}
 
-  async execute(config: ScanConfig): Promise<Result<RestockOpportunity[]>> {
+  async execute(config: ScanConfig): Promise<Result<ScanResult>> {
     const doc = this.navigator.currentDocument();
     const listingsResult = this.scraper.scrapeListings(doc);
 
     return listingsResult.chainAsync(async listings => {
       const opportunities: RestockOpportunity[] = [];
+      let bestItem: BestItem | null = null;
 
       const { results } = await pool(
         listings,
         async listing => {
           const priceResult = await this.pricer.getPrice(listing.itemName);
           if (priceResult.isErr()) return null;
-
           const marketPrice = priceResult.unwrap().price;
-          const profit = marketPrice.subtract(listing.price);
-          if (profit.isGreaterThan(config.profitThreshold)) {
-            return { listing, marketPrice, profit } satisfies RestockOpportunity;
-          }
-          return null;
+          return { listing, marketPrice };
         },
         { concurrency: config.concurrency ?? 3 },
       );
 
-      for (const opp of results) {
-        if (!opp) continue;
-        opportunities.push(opp);
-        await this.buyer.buy(opp.listing);
+      for (const result of results) {
+        if (!result) continue;
+        const { listing, marketPrice } = result;
+        const profitAmount = marketPrice.amount - listing.price.amount;
+
+        if (!bestItem || profitAmount > bestItem.profitAmount) {
+          bestItem = { name: String(listing.itemName), profitAmount };
+        }
+
+        if (profitAmount > config.profitThreshold.amount) {
+          const opp: RestockOpportunity = {
+            listing,
+            marketPrice,
+            profit: marketPrice.subtract(listing.price),
+          };
+          opportunities.push(opp);
+          await this.buyer.buy(opp.listing);
+        }
       }
 
-      return Ok.from(opportunities);
+      return Ok.from({ opportunities, bestItem });
     });
   }
 }

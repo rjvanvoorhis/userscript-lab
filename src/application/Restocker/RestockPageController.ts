@@ -57,14 +57,20 @@ export class RestockPageController {
     if (!config.autobuyEnabled && !config.autorefreshEnabled) return;
 
     if (config.autobuyEnabled) {
-      await this.scanner.execute({ profitThreshold: config.minProfitMargin });
+      const result = await this.scanner.execute({ profitThreshold: config.minProfitMargin });
+      if (result.isOK()) {
+        const { bestItem } = result.unwrap();
+        if (bestItem) {
+          const sign = bestItem.profitAmount >= 0 ? '+' : '-';
+          const abs = Math.abs(bestItem.profitAmount).toLocaleString();
+          this.panel.setBestItem(bestItem.name, `${sign}${abs} NP`);
+        }
+      }
     }
 
     if (config.autorefreshEnabled) {
-      const shop = this.shops[config.shopId];
-      if (!shop) return;
       await sleep(config.refreshFrequencyMs);
-      await this.navigator.navigateTo(shop.url);
+      await this.navigator.navigateTo(this.navigator.currentDocument().location.href);
     }
   }
 }

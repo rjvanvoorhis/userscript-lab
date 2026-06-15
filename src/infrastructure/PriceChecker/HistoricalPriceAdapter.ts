@@ -16,7 +16,7 @@ export type ItemData = Record<string, number>;
 
 export class HistoricalPriceAdapter implements IPriceChecker {
 
-  constructor (private _data: ItemData){}
+  constructor (private readonly _data: ItemData){}
 
   static async fetchSnapshot(url: string = HISTORICAL_PRICE_API_BASE): Promise<Snapshot> {
     const result = await fetch(url);
