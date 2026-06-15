@@ -8,6 +8,7 @@ export default defineConfig({
       '@domain': resolve('./src/domain'),
       '@application': resolve('./src/application'),
       '@infrastructure': resolve('./src/infrastructure'),
+      '@presentation': resolve('./src/presentation'),
     },
   },
   test: {

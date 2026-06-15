@@ -1,9 +1,14 @@
 import { sleep } from "@core/concurrency/sleep";
+import { Signal } from "@core/Signal";
 import { NeoPoint } from "@domain/shared/NeoPoint";
 import type { INavigator } from "@application/shared/INavigator";
 import type { IStorage } from "@application/shared/IStorage";
 import type { ScanRestockShopUseCase } from "@application/Restocker/ScanRestockShopUseCase";
-import type { IRestockPanel, RestockConfig } from "@application/Restocker/IRestockPanel";
+import type {
+  BestItem,
+  IRestockPanel,
+  RestockConfig,
+} from "@application/Restocker/IRestockPanel";
 
 const STORAGE_KEY = "restocker_config";
 
@@ -39,31 +44,39 @@ export class RestockPageController {
 
   async start(defaults: RestockConfig): Promise<void> {
     const stored = await this.storage.get(STORAGE_KEY) as PersistedConfig | null;
-    // shopId always comes from the URL (defaults); all other settings restored from storage
     const config: RestockConfig = stored
       ? { ...fromPersistedConfig(stored), shopId: defaults.shopId }
       : defaults;
+
+    const configSignal = new Signal<RestockConfig>(config);
+    const bestItemSignal = new Signal<BestItem | null>(null);
 
     const shopNames = Object.fromEntries(
       Object.entries(this.shops).map(([id, { name }]) => [id, name]),
     );
 
-    this.panel.mount(shopNames, config);
+    this.panel.mount(shopNames, configSignal, bestItemSignal);
     this.panel.onConfigChange(async (next) => {
+      const prevShopId = configSignal.value.shopId;
+      configSignal.set(next);
       await this.storage.set(STORAGE_KEY, toPersistedConfig(next));
-      if (next.shopId !== config.shopId) {
+      if (next.shopId !== prevShopId) {
         const shop = this.shops[next.shopId];
         if (shop) await this.navigator.navigateTo(shop.url);
       }
     });
 
-    await this.run(config);
+    await this.run(configSignal, bestItemSignal);
   }
 
-  private async run(config: RestockConfig): Promise<void> {
+  private async run(
+    configSignal: Signal<RestockConfig>,
+    bestItemSignal: Signal<BestItem | null>,
+  ): Promise<void> {
+    const config = configSignal.value;
     if (!config.autobuyEnabled && !config.autorefreshEnabled) return;
 
-    if (config.autobuyEnabled && await this.scanAndBuy(config)) return;
+    if (config.autobuyEnabled && await this.scanAndBuy(configSignal, bestItemSignal)) return;
 
     if (config.autorefreshEnabled) {
       await sleep(config.refreshFrequencyMs);
@@ -71,24 +84,30 @@ export class RestockPageController {
     }
   }
 
-  private async scanAndBuy(config: RestockConfig): Promise<boolean> {
+  private async scanAndBuy(
+    configSignal: Signal<RestockConfig>,
+    bestItemSignal: Signal<BestItem | null>,
+  ): Promise<boolean> {
+    const config = configSignal.value;
     const result = await this.scanner.execute({ profitThreshold: config.minProfitMargin });
     if (result.isErr()) return false;
 
     const { bestItem, purchased } = result.unwrap();
 
     if (bestItem) {
-      const sign = bestItem.profitAmount >= 0 ? '+' : '-';
+      const sign = bestItem.profitAmount >= 0 ? "+" : "-";
       const abs = Math.abs(bestItem.profitAmount).toLocaleString();
-      this.panel.setBestItem(bestItem.name, `${sign}${abs} NP`, bestItem.profitAmount > 0);
+      bestItemSignal.set({
+        name: bestItem.name,
+        value: `${sign}${abs} NP`,
+        profitable: bestItem.profitAmount > 0,
+      });
     }
 
     if (purchased) {
-      await this.storage.set(STORAGE_KEY, toPersistedConfig({
-        ...config,
-        autobuyEnabled: false,
-        autorefreshEnabled: false,
-      }));
+      const next = { ...config, autobuyEnabled: false, autorefreshEnabled: false };
+      configSignal.set(next);
+      await this.storage.set(STORAGE_KEY, toPersistedConfig(next));
     }
 
     return purchased;

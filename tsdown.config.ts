@@ -1,5 +1,27 @@
 import { defineConfig } from 'tsdown'
-import { resolve } from 'node:path'
+import { resolve, dirname } from 'node:path'
+import { readFileSync } from 'node:fs'
+
+const RAW_PREFIX = '\0raw-file:'
+
+const rawPlugin = {
+  name: 'raw-files',
+  resolveId(source: string, importer?: string) {
+    if (!importer) return
+    const clean = source.split('?')[0]
+    if (clean.endsWith('.html') || clean.endsWith('.css')) {
+      const abs = resolve(dirname(importer), clean)
+      // Encode so the virtual ID never contains '.css' — prevents tsdown:css-guard from firing
+      return `${RAW_PREFIX}${Buffer.from(abs).toString('base64url')}`
+    }
+  },
+  load(id: string) {
+    if (id.startsWith(RAW_PREFIX)) {
+      const filePath = Buffer.from(id.slice(RAW_PREFIX.length), 'base64url').toString()
+      return `export default ${JSON.stringify(readFileSync(filePath, 'utf-8'))}`
+    }
+  },
+}
 
 const userscriptBanner = `// ==UserScript==
 // @name        Neopets Assistant
@@ -31,6 +53,8 @@ export default defineConfig({
       '@domain': resolve('./src/domain'),
       '@application': resolve('./src/application'),
       '@infrastructure': resolve('./src/infrastructure'),
+      '@presentation': resolve('./src/presentation'),
     },
   },
+  plugins: [rawPlugin],
 })

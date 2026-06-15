@@ -1,0 +1,27 @@
+<div id="restocker-panel">
+  <strong>Restocker</strong>
+  <table>
+    <tr>
+      <td><label for="rp-autobuy">Autobuy</label></td>
+      <td><input type="checkbox" id="rp-autobuy" data-ref="autobuy"></td>
+    </tr>
+    <tr>
+      <td><label for="rp-autorefresh">Autorefresh</label></td>
+      <td><input type="checkbox" id="rp-autorefresh" data-ref="autorefresh"></td>
+    </tr>
+    <tr>
+      <td><label for="rp-frequency">Frequency (ms)</label></td>
+      <td><input type="number" id="rp-frequency" data-ref="frequency" min="1000" style="width:70px"></td>
+    </tr>
+    <tr>
+      <td><label for="rp-shop">Shop</label></td>
+      <td><select id="rp-shop" data-ref="shop"></select></td>
+    </tr>
+    <tr>
+      <td><label for="rp-margin">Min Profit (NP)</label></td>
+      <td><input type="number" id="rp-margin" data-ref="margin" min="0" style="width:70px"></td>
+    </tr>
+    <tr><td colspan="2" data-ref="refresh-slot"></td></tr>
+  </table>
+  <div data-ref="best-item"></div>
+</div>

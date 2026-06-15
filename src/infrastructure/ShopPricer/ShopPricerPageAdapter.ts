@@ -15,7 +15,7 @@ export class ShopPricerPageAdapter implements IShopPricerPage {
       const nameEl = cells[0].querySelector("b");
       const imageEl = cells[1].querySelector<HTMLElement>("input[type='image'], img");
       const priceInput = row.querySelector<HTMLInputElement>(
-        "input[name='cost_1']",
+        "input[name^='cost_']",
       );
 
       if (!nameEl || !imageEl || !priceInput) return [];

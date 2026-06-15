@@ -28,6 +28,7 @@ import { BetPageScraper } from '@infrastructure/BetForecast/BetPageScraper';
 import { BetSubmitterAdapter } from '@infrastructure/BetForecast/BetSubmitterAdapter';
 import { BetRecordAdapter } from '@infrastructure/BetForecast/BetRecordAdapter';
 import { LocalBetAdvisor } from '@infrastructure/BetForecast/LocalBetAdvisor';
+import { createPanel } from '@presentation/shared/dom';
 import { PlaceOptimalBetsUseCase } from '@application/BetForecast/PlaceOptimalBetsUseCase';
 import { ShopPricerPageAdapter } from '@infrastructure/ShopPricer/ShopPricerPageAdapter';
 import { PriceShopItemsUseCase } from '@application/ShopPricer/PriceShopItemsUseCase';
@@ -203,21 +204,5 @@ function renderSDBReport(report: import('@application/SDBManager/GenerateSDBRepo
   document.body.appendChild(panel);
 }
 
-
-function createPanel(title: string): HTMLDivElement {
-  const panel = document.createElement('div');
-  panel.style.cssText = [
-    'position:fixed', 'top:10px', 'right:10px', 'z-index:99999',
-    'background:#fff', 'border:2px solid #333', 'border-radius:6px',
-    'padding:12px', 'max-width:300px', 'font-family:sans-serif', 'font-size:13px',
-  ].join(';');
-
-  const h = document.createElement('h3');
-  h.textContent = title;
-  h.style.margin = '0 0 8px';
-  panel.appendChild(h);
-
-  return panel;
-}
 
 main();
