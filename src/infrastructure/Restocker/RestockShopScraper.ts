@@ -26,8 +26,9 @@ export class RestockShopScraper implements IRestockShopScraper {
       let price: NeoPoint;
       try {
         itemName = ItemName.from(rawName);
-        price = NeoPoint.from(Number.parseInt(rawPrice, 10));
+        price = NeoPoint.from(Number.parseInt(rawPrice.replace(/,/g, ""), 10));
       } catch {
+        console.error(`Failed to parse listing: ${rawName}`);
         continue;
       }
 

@@ -117,7 +117,7 @@ export class RestockPanelAdapter implements IRestockPanel {
     this.bestItemEl = el("div", {
       style: "margin-top:8px;font-size:12px;color:#555;word-break:break-word",
     });
-    this.bestItemEl.textContent = "Current Best Item: —";
+    this.bestItemEl.textContent = "Current Best Item: N/A";
 
     panel.appendChild(title);
     panel.appendChild(table);
@@ -169,7 +169,7 @@ export class RestockPanelAdapter implements IRestockPanel {
 
   setBestItem(name: string, value: string): void {
     if (this.bestItemEl) {
-      this.bestItemEl.textContent = `Current Best Item: ${name} - ${value}`;
+      this.bestItemEl.textContent = `Current Best Item: ${name}  ${value}`;
     }
   }
 }

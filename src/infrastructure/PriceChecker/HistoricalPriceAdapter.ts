@@ -46,7 +46,8 @@ export class HistoricalPriceAdapter implements IPriceChecker {
   }
 
   async getPrice(itemName: ItemName): Promise<Result<ItemPrice>> {
-    const price = NeoPoint.from(this._data[ItemName.name] || 0);
+    console.log(`There are ${Object.entries(this._data).length} items in the database`);
+    const price = NeoPoint.from(this._data[itemName.value] || 0);
     return Ok.from({
       itemName,
       price

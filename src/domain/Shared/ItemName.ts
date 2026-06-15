@@ -2,7 +2,7 @@ export class ItemName {
   private constructor(readonly value: string) {}
 
   static from(raw: string): ItemName {
-    const trimmed = raw.trim().toLowerCase();
+    const trimmed = raw.trim();
     if (trimmed.length === 0) throw new Error('ItemName cannot be empty');
     return new ItemName(trimmed);
   }

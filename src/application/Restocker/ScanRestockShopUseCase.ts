@@ -69,6 +69,9 @@ export class ScanRestockShopUseCase {
           await this.buyer.buy(opp.listing);
         }
       }
+
+      console.log(`Scan complete. Found ${opportunities.length} opportunities. Best item: ${bestItem ? `${bestItem.name} with profit ${bestItem.profitAmount}` : "N/A"}`);
+      console.log({bestItem});
       return Ok.from({ opportunities, bestItem });
     });
   }
