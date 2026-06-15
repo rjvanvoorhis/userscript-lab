@@ -70,7 +70,7 @@ export class RestockPageController {
         if (bestItem) {
           const sign = bestItem.profitAmount >= 0 ? '+' : '-';
           const abs = Math.abs(bestItem.profitAmount).toLocaleString();
-          this.panel.setBestItem(bestItem.name, `${sign}${abs} NP`);
+          this.panel.setBestItem(bestItem.name, `${sign}${abs} NP`, bestItem.profitAmount > 0);
         }
       }
     }

@@ -167,9 +167,10 @@ export class RestockPanelAdapter implements IRestockPanel {
     this.refreshHandler = handler;
   }
 
-  setBestItem(name: string, value: string): void {
+  setBestItem(name: string, value: string, profitable: boolean): void {
     if (this.bestItemEl) {
       this.bestItemEl.textContent = `Current Best Item: ${name}  ${value}`;
+      this.bestItemEl.style.outline = profitable ? '2px solid #2a8a2a' : '2px solid #cc4444';
     }
   }
 }

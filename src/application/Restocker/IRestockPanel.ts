@@ -12,5 +12,5 @@ export interface IRestockPanel {
   mount(shops: Record<string, string>, initial: RestockConfig): void;
   onConfigChange(handler: (config: RestockConfig) => void): void;
   onRefreshPrices(handler: () => void): void;
-  setBestItem(name: string, value: string): void;
+  setBestItem(name: string, value: string, profitable: boolean): void;
 }
