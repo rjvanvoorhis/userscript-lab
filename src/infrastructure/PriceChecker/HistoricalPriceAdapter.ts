@@ -1,9 +1,10 @@
 import { Ok, type Result } from '@core/result';
 import type { IPriceChecker } from '@application/shared/IPriceChecker';
+import type { IStorage } from '@application/shared/IStorage';
 import { ItemName } from '@domain/shared/ItemName';
 import type { ItemPrice } from '@domain/shared/ItemPrice';
 import { NeoPoint } from '@domain/shared';
-import { HISTORICAL_PRICE_API_BASE } from '@core/constants';
+import { HISTORICAL_PRICE_API_BASE, HISTORICAL_PRICE_CACHE_KEY } from '@core/constants';
 
 export type SnapshotItem = {
   ImgURL: string;
@@ -35,6 +36,15 @@ export class HistoricalPriceAdapter implements IPriceChecker {
       ]),
     );
     return new HistoricalPriceAdapter(data);
+  }
+
+  static async loadCached(storage: IStorage): Promise<HistoricalPriceAdapter> {
+    const cached = await storage.get(HISTORICAL_PRICE_CACHE_KEY);
+    if (cached) return HistoricalPriceAdapter.fromData(cached as ItemData);
+    const snapshot = await HistoricalPriceAdapter.fetchSnapshot();
+    const adapter = HistoricalPriceAdapter.fromSnapshot(snapshot);
+    await storage.set(HISTORICAL_PRICE_CACHE_KEY, adapter.getData());
+    return adapter;
   }
 
   static fromData(data: ItemData): HistoricalPriceAdapter {

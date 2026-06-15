@@ -1,14 +1,14 @@
 import { sleep } from "@core/concurrency/sleep";
 import { Signal } from "@core/Signal";
+import { HISTORICAL_PRICE_CACHE_KEY } from "@core/constants";
+import { NEOPETS_SHOPS } from "@core/shops";
 import { NeoPoint } from "@domain/shared/NeoPoint";
-import type { INavigator } from "@application/shared/INavigator";
-import type { IStorage } from "@application/shared/IStorage";
+import type { BestItem, RestockConfig } from "@application/Restocker/IRestockPanel";
 import type { ScanRestockShopUseCase } from "@application/Restocker/ScanRestockShopUseCase";
-import type {
-  BestItem,
-  IRestockPanel,
-  RestockConfig,
-} from "@application/Restocker/IRestockPanel";
+import { HistoricalPriceAdapter } from "@infrastructure/PriceChecker/HistoricalPriceAdapter";
+import { LocalStorageAdapter } from "@infrastructure/shared/LocalStorageAdapter";
+import { NavigatorAdapter } from "@infrastructure/shared/NavigatorAdapter";
+import { RestockPanelAdapter } from "@infrastructure/Restocker/RestockPanelAdapter";
 
 const STORAGE_KEY = "restocker_config";
 
@@ -20,11 +20,6 @@ type PersistedConfig = {
   readonly minProfitMarginAmount: number;
 };
 
-export type ShopEntry = {
-  readonly name: string;
-  readonly url: string;
-};
-
 function toPersistedConfig(config: RestockConfig): PersistedConfig {
   return { ...config, minProfitMarginAmount: config.minProfitMargin.amount };
 }
@@ -33,14 +28,12 @@ function fromPersistedConfig(data: PersistedConfig): RestockConfig {
   return { ...data, minProfitMargin: NeoPoint.from(data.minProfitMarginAmount) };
 }
 
-export class RestockPageController {
-  constructor(
-    private readonly panel: IRestockPanel,
-    private readonly scanner: ScanRestockShopUseCase,
-    private readonly navigator: INavigator,
-    private readonly storage: IStorage,
-    private readonly shops: Record<string, ShopEntry>,
-  ) {}
+export class RestockPresenter {
+  private readonly storage = new LocalStorageAdapter();
+  private readonly navigator = new NavigatorAdapter();
+  private readonly panel = new RestockPanelAdapter();
+
+  constructor(private readonly useCase: ScanRestockShopUseCase) {}
 
   async start(defaults: RestockConfig): Promise<void> {
     const stored = await this.storage.get(STORAGE_KEY) as PersistedConfig | null;
@@ -52,18 +45,27 @@ export class RestockPageController {
     const bestItemSignal = new Signal<BestItem | null>(null);
 
     const shopNames = Object.fromEntries(
-      Object.entries(this.shops).map(([id, { name }]) => [id, name]),
+      Object.entries(NEOPETS_SHOPS).map(([id, { name }]) => [id, name]),
     );
 
     this.panel.mount(shopNames, configSignal, bestItemSignal);
+
     this.panel.onConfigChange(async (next) => {
       const prevShopId = configSignal.value.shopId;
       configSignal.set(next);
       await this.storage.set(STORAGE_KEY, toPersistedConfig(next));
       if (next.shopId !== prevShopId) {
-        const shop = this.shops[next.shopId];
+        const shop = NEOPETS_SHOPS[next.shopId];
         if (shop) await this.navigator.navigateTo(shop.url);
       }
+    });
+
+    this.panel.onRefreshPrices(async () => {
+      await this.storage.remove(HISTORICAL_PRICE_CACHE_KEY);
+      const fresh = await HistoricalPriceAdapter.fetchSnapshot();
+      const freshPricer = HistoricalPriceAdapter.fromSnapshot(fresh);
+      await this.storage.set(HISTORICAL_PRICE_CACHE_KEY, freshPricer.getData());
+      await this.navigator.navigateTo(this.navigator.currentDocument().location.href);
     });
 
     await this.run(configSignal, bestItemSignal);
@@ -89,7 +91,7 @@ export class RestockPageController {
     bestItemSignal: Signal<BestItem | null>,
   ): Promise<boolean> {
     const config = configSignal.value;
-    const result = await this.scanner.execute({ profitThreshold: config.minProfitMargin });
+    const result = await this.useCase.execute({ profitThreshold: config.minProfitMargin });
     if (result.isErr()) return false;
 
     const { bestItem, purchased } = result.unwrap();

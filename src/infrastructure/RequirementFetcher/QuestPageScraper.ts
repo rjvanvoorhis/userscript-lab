@@ -1,4 +1,4 @@
-import type { QuestPageScraperContract } from '@application/RequirementFetcher/FetchQuestRequirementsUseCase';
+import type { QuestPageScraperContract } from '@application/RequirementFetcher/QuestUseCase';
 import type { ItemName } from '@domain/shared/ItemName';
 
 export class QuestPageScraper implements QuestPageScraperContract {
