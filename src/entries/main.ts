@@ -113,7 +113,7 @@ function main() {
     }
 
     const documentService = new DocumentServiceAdapter();
-    const captchaSolver = new UrlMapCaptchaSolver({});
+    const captchaSolver = new UrlMapCaptchaSolver();
     const npcBuyer = new NPCShopBuyerAdapter(captchaSolver, documentService);
     const shopScraper = new RestockShopScraper();
     const buyAdapter = new RestockBuyAdapter(npcBuyer);
