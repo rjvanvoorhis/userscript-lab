@@ -117,7 +117,7 @@ function main() {
     const captchaSolver = new UrlMapCaptchaSolver();
     const npcBuyer = new NPCShopBuyerAdapter(captchaSolver, documentService);
     const shopScraper = new RestockShopScraper();
-    const buyAdapter = new RestockBuyAdapter(npcBuyer);
+    const buyAdapter = new RestockBuyAdapter(npcBuyer, navigator);
     const scanUseCase = new ScanRestockShopUseCase(navigator, shopScraper, historicalPricer, buyAdapter);
     const panel = new RestockPanelAdapter();
     const controller = new RestockPageController(panel, scanUseCase, navigator, storage, NEOPETS_SHOPS);

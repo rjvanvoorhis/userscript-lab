@@ -63,21 +63,34 @@ export class RestockPageController {
   private async run(config: RestockConfig): Promise<void> {
     if (!config.autobuyEnabled && !config.autorefreshEnabled) return;
 
-    if (config.autobuyEnabled) {
-      const result = await this.scanner.execute({ profitThreshold: config.minProfitMargin });
-      if (result.isOK()) {
-        const { bestItem } = result.unwrap();
-        if (bestItem) {
-          const sign = bestItem.profitAmount >= 0 ? '+' : '-';
-          const abs = Math.abs(bestItem.profitAmount).toLocaleString();
-          this.panel.setBestItem(bestItem.name, `${sign}${abs} NP`, bestItem.profitAmount > 0);
-        }
-      }
-    }
+    if (config.autobuyEnabled && await this.scanAndBuy(config)) return;
 
     if (config.autorefreshEnabled) {
       await sleep(config.refreshFrequencyMs);
       await this.navigator.navigateTo(this.navigator.currentDocument().location.href);
     }
+  }
+
+  private async scanAndBuy(config: RestockConfig): Promise<boolean> {
+    const result = await this.scanner.execute({ profitThreshold: config.minProfitMargin });
+    if (result.isErr()) return false;
+
+    const { bestItem, purchased } = result.unwrap();
+
+    if (bestItem) {
+      const sign = bestItem.profitAmount >= 0 ? '+' : '-';
+      const abs = Math.abs(bestItem.profitAmount).toLocaleString();
+      this.panel.setBestItem(bestItem.name, `${sign}${abs} NP`, bestItem.profitAmount > 0);
+    }
+
+    if (purchased) {
+      await this.storage.set(STORAGE_KEY, toPersistedConfig({
+        ...config,
+        autobuyEnabled: false,
+        autorefreshEnabled: false,
+      }));
+    }
+
+    return purchased;
   }
 }

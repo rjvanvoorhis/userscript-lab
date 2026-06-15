@@ -21,6 +21,7 @@ export type BestItem = {
 export type ScanResult = {
   readonly opportunities: RestockOpportunity[];
   readonly bestItem: BestItem | null;
+  readonly purchased: boolean;
 };
 
 export class ScanRestockShopUseCase {
@@ -38,6 +39,7 @@ export class ScanRestockShopUseCase {
     return listingsResult.chainAsync(async (listings) => {
       const opportunities: RestockOpportunity[] = [];
       let bestItem: BestItem | null = null;
+      let purchased = false;
 
       const { results } = await pool(
         listings,
@@ -66,11 +68,15 @@ export class ScanRestockShopUseCase {
             profit: marketPrice.subtract(listing.price),
           };
           opportunities.push(opp);
-          await this.buyer.buy(opp.listing);
+          const buyResult = await this.buyer.buy(opp.listing);
+          if (buyResult.isOK() && buyResult.unwrap().succeeded) {
+            purchased = true;
+            break;
+          }
         }
       }
 
-      return Ok.from({ opportunities, bestItem });
+      return Ok.from({ opportunities, bestItem, purchased });
     });
   }
 }

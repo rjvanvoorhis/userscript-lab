@@ -1,15 +1,17 @@
 import type { IDocument } from "@application/shared/IDocument";
 
 export class DocumentServiceAdapter implements IDocument {
+  constructor(private readonly doc: Document = globalThis.document) {}
+
   getHref() {
-    return document.location.href;
+    return this.doc.location.href;
   }
 
   containsText(text: string) {
-    return document.body.innerText.includes(text);
+    return this.doc.body.innerText.includes(text);
   }
 
   querySelector<T extends Element>(selector: string) {
-    return document.querySelector<T>(selector);
+    return this.doc.querySelector<T>(selector);
   }
 }

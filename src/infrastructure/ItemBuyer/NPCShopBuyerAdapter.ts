@@ -14,28 +14,29 @@ export class NPCShopBuyerAdapter implements IShopPurchaser {
     private readonly document: IDocument,
   ) {}
 
-  private isSoldOut() {
-    return this.document.containsText("SOLD OUT!");
+  private isSoldOut(doc: IDocument) {
+    return doc.containsText("SOLD OUT!");
   }
 
-  private getCaptchaImage() {
-    const el = this.document.querySelector<HTMLInputElement>("input[type='image']");
+  private getCaptchaImage(doc: IDocument) {
+    const el = doc.querySelector<HTMLInputElement>("input[type='image']");
     if (!el) {
       return Err.from<string>(new Error("Captcha image not found"));
     }
     return Ok.from(el.src);
   }
 
-  async purchase(listing: ShopListing): Promise<Result<PurchaseAttempt>> {
+  async purchase(listing: ShopListing, document?: IDocument): Promise<Result<PurchaseAttempt>> {
+    const doc = document ?? this.document;
     const item = String(listing.itemName);
 
-    if (this.isSoldOut()) {
+    if (this.isSoldOut(doc)) {
       logger.debug('Item sold out, skipping', { item });
       return Ok.from({ listing, succeeded: false });
     }
 
     return (
-      await this.getCaptchaImage()
+      await this.getCaptchaImage(doc)
         .chainAsync((url) => {
           logger.debug('Solving captcha', { item, url });
           return this.solver.solve(url);
