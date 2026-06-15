@@ -32,10 +32,10 @@ export class LegacyShopWizardAdapter implements IPriceChecker {
         const response = await fetch(LEGACY_SHOP_WIZARD_AJAX_URL, {
           method: 'POST',
           credentials: 'include',
+          referrer: SHOP_WIZARD_URL,
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
             'X-Requested-With': 'XMLHttpRequest',
-            'Referer': SHOP_WIZARD_URL,
           },
           body: body.toString(),
         });
