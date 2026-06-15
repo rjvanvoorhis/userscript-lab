@@ -1,0 +1,225 @@
+{
+  "log": {
+    "version": "1.2",
+    "creator": {
+      "name": "Firefox",
+      "version": "150.0"
+    },
+    "browser": {
+      "name": "Firefox",
+      "version": "150.0"
+    },
+    "pages": [
+      {
+        "id": "page_1",
+        "pageTimings": {
+          "onContentLoad": 697,
+          "onLoad": 831
+        },
+        "startedDateTime": "2026-06-15T15:39:45.869-04:00",
+        "title": "https://www.neopets.com/shops/wizard.phtml"
+      }
+    ],
+    "entries": [
+      {
+        "startedDateTime": "2026-06-15T15:39:45.869-04:00",
+        "request": {
+          "bodySize": 108,
+          "method": "POST",
+          "url": "https://www.neopets.com/np-templates/ajax/wizard.php",
+          "httpVersion": "HTTP/2",
+          "headers": [
+            {
+              "name": "Host",
+              "value": "www.neopets.com"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html, */*; q=0.01"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "en-US,en;q=0.9"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip, deflate, br, zstd"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded; charset=UTF-8"
+            },
+            {
+              "name": "X-Requested-With",
+              "value": "XMLHttpRequest"
+            },
+            {
+              "name": "Content-Length",
+              "value": "108"
+            },
+            {
+              "name": "Origin",
+              "value": "https://www.neopets.com"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Referer",
+              "value": "https://www.neopets.com/shops/wizard.phtml"
+            },
+            {
+              "name": "Cookie",
+              "value": "{{COOKIE}}"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "empty"
+            },
+            {
+              "name": "Sec-Fetch-Mode",
+              "value": "cors"
+            },
+            {
+              "name": "Sec-Fetch-Site",
+              "value": "same-origin"
+            },
+            {
+              "name": "Priority",
+              "value": "u=0"
+            },
+            {
+              "name": "TE",
+              "value": "trailers"
+            }
+          ],
+          "cookies": [],
+          "queryString": [],
+          "headersSize": 4538,
+          "postData": {
+            "mimeType": "application/x-www-form-urlencoded",
+            "params": [
+              {
+                "name": "type",
+                "value": "process_wizard"
+              },
+              {
+                "name": "feedset",
+                "value": "0"
+              },
+              {
+                "name": "shopwizard",
+                "value": "Vo Codestone"
+              },
+              {
+                "name": "table",
+                "value": "shop"
+              },
+              {
+                "name": "criteria",
+                "value": "exact"
+              },
+              {
+                "name": "min_price",
+                "value": "0"
+              },
+              {
+                "name": "max_price",
+                "value": "999999"
+              }
+            ],
+            "text": "type=process_wizard&feedset=0&shopwizard=Vo+Codestone&table=shop&criteria=exact&min_price=0&max_price=999999"
+          }
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "httpVersion": "HTTP/2",
+          "headers": [
+            {
+              "name": "server",
+              "value": "Apache"
+            },
+            {
+              "name": "x-powered-by",
+              "value": "PHP/5.4.28"
+            },
+            {
+              "name": "x-cobalt",
+              "value": "loaded"
+            },
+            {
+              "name": "content-encoding",
+              "value": "gzip"
+            },
+            {
+              "name": "content-length",
+              "value": "2069"
+            },
+            {
+              "name": "content-type",
+              "value": "text/html; charset=UTF-8"
+            },
+            {
+              "name": "expires",
+              "value": "Mon, 15 Jun 2026 19:39:46 GMT"
+            },
+            {
+              "name": "cache-control",
+              "value": "max-age=0, no-cache, no-store"
+            },
+            {
+              "name": "pragma",
+              "value": "no-cache"
+            },
+            {
+              "name": "date",
+              "value": "Mon, 15 Jun 2026 19:39:46 GMT"
+            },
+            {
+              "name": "vary",
+              "value": "Accept-Encoding"
+            },
+            {
+              "name": "access-control-allow-origin",
+              "value": "*"
+            },
+            {
+              "name": "X-Firefox-Spdy",
+              "value": "h2"
+            }
+          ],
+          "cookies": [],
+          "content": {
+            "mimeType": "text/html; charset=UTF-8",
+            "size": 7799,
+            "text": " \n<style type=\"text/css\">\n\t.bgYellow {\n\t\tbackground-color: #FFCC00;\n\t}\n\n\t.blistHeader {\n\t\tbackground-color: #FFCC00;\n\t\tfont-weight: bold;\n\t\tfont-size: 11px;\n\t\tcolor: #000000;\n\t}\n\n\t.blistTopic {\n\t\tfont-size: 12px;\n\t}\n\n\t.blistSmall {\n\t\tfont-weight: normal;\n\t\tfont-size: 11px;\n\t}\n\n\t.topicSmall {\n\t\tfont-weight: normal;\n\t\tfont-size: 10px;\n\t}\n\n\t.topic {\n\t\tbackground-color: #FFFFFF;\n\t\tfont-weight: normal;\n\t\tfont-size: 12px;\n\t\tcolor: #000000;\n\t\tborder-bottom: 1px solid #000000;\n\t}\n\n\t.topicPosted {\n\t\tbackground-color: #F6F6F6;\n\t\tfont-weight: normal;\n\t\tfont-size: 10px;\n\t\tcolor: #000000;\n\t\tborder-bottom: 1px solid #000000;\n\t}\n\n\t.topicAuthor {\n\t\tbackground-color: #F6F6F6;\n\t\tfont-weight: normal;\n\n\t\tborder-right: 1px solid #000000;\n\t\tborder-bottom: 1px solid #000000;\n\t}\n\n\t.blockquote {\n\t\tmargin: 10px;\n\t}\n\n\t.quote {\n\t\tbackground-color: #F6F6F6;\n\t\tfont-size: 11px;\n\t\tfont-style: italic;\n\t\tborder: 1px solid #000000;\n\t\tpadding: 5px;\n\t}\n</style>\n\n\n<script language=\"JavaScript\">\n\tvar NeoboardPens = {};\n  NeoboardPens.maxPostLength = 400;\n\n\tfunction insertSmiley(smiley) {\n\t\tdocument.message_form.message.value += smiley;\n\t\ttextCounter(document.message_form.message, document.message_form.remLen, NeoboardPens.maxPostLength);\n\t\tdocument.message_form.message.focus();\n\t\treturn false;\n\t}\n\n\tvar submitcount = 0;\n\n\tfunction validateNewTopic() {\n\t\tvar missing = \"\";\n\n\t\tif (message_form.topic_title.value == \"\") {\t\t// missing title\n\t\t\tmissing += \"     - Title\\n\";\n\t\t}\n\n\t\tif (message_form.message.value == \"\") {\t\t// if too long...trim it!\n\t\t\tmissing += \"     - Message\\n\";\n\t\t}\n\n\t\tif (missing != \"\") {\n\t\t\talert(\"Please fill in the following item(s):\\n\" + missing);\n\t\t\treturn false;\n\t\t} else {\n\t\t\tif (submitcount == 0) {\n\t\t      submitcount++;\n\t\t      return true;\n\t\t   } else {\n\t\t      alert(\"Oops, you've already submitted your post.\\nPlease wait for it to go through so you don't spam. :)\");\n\t\t      return false;\n\t\t   }\n\t\t}\n\t}\n\n\tfunction blockMultipleReplies() {\n\t\tif (submitcount == 0) {\n\t      submitcount++;\n\t      return true;\n\t   } else {\n\t      alert(\"Oops, you've already submitted your post.\\nPlease wait for it to go through so you don't spam. :)\");\n\t      return false;\n\t   }\n\t}\n\n\tfunction textCounter(field, countfield, maxlimit) {\n\t\tmaxlimit = maxlimit || NeoboardPens.maxPostLength;\n\t\tif (field.value.length > maxlimit) {\t\t// if too long...trim it!\n\t\t\tfield.value = field.value.substring(0, maxlimit);\n\t\t} else {\t\t\t\t\t\t\t\t\t// otherwise, update 'characters left' counter\n\t\t\tcountfield.value = maxlimit - field.value.length;\n\t\t}\n\t}\n\n\tfunction openWin(url, height, width, scroll, menu, resize, tool, loc, status) {\n\t\theight = (height) ? height : 200;\n\t\twidth = (width) ? width : 400;\n\t\tscroll = (scroll) ? 'yes' : 'no';\n\t\tmenu = (menu) ? 'yes' : 'no';\n\t\tresize = (resize) ? 'yes' : 'no';\n\t\ttool = (tool) ? 'yes' : 'no';\n\t\tloc = (loc) ? 'yes' : 'no';\n\t\tstatus = (status) ? 'yes' : 'no';\n\t\toptions = 'scrollbars='+scroll+',menubar='+menu+',height='+height+',width='+width+',resizable='+resize+',toolbar='+tool+',location='+loc+',status='+status;\n\t\tif (url) {\n\t\t\tvar load = window.open(url,'', options);\n\t\t}\n\t}\n</script>\n\n\n\n<div class='wizard-results-header'>\n\t\t\t\t\t<div class='wizard-char wizard-char-old'></div>\n\t\t\t\t\t<div class='wizard-results-text'><p>Searching for: <h3>Vo Codestone</h3></p> <a href=\"/search.phtml?selected_type=object&string=Vo Codestone\"><p>Get details on this item.</p></a></div>\n\t\t\t\t</div><div class='wizard-results-grid wizard-results-grid-shop'><ul><li class='wizard-results-grid-header'>\n\t\t\t\t<h3>Shop Owner</h3>\n\t\t\t\t<!--<td class=\"contentModuleHeaderAlt\">Item</td>-->\n\t\t\t\t<h3>Stock</h3><h3>Price</h3></li><li><a href=\"/browseshop.phtml?owner=migs143&buy_obj_info_id=7461&buy_cost_neopoints=3068\">migs143</a><p>8</p><div class='wizard-results-price'>3,068 NP</div></li><li><a href=\"/browseshop.phtml?owner=mahical&buy_obj_info_id=7461&buy_cost_neopoints=3085\">mahical</a><p>11</p><div class='wizard-results-price'>3,085 NP</div></li><li><a href=\"/browseshop.phtml?owner=maxs_little_girl&buy_obj_info_id=7461&buy_cost_neopoints=3088\">maxs_little_girl</a><p>1</p><div class='wizard-results-price'>3,088 NP</div></li><li><a href=\"/browseshop.phtml?owner=zeus_248&buy_obj_info_id=7461&buy_cost_neopoints=3093\">zeus_248</a><p>4</p><div class='wizard-results-price'>3,093 NP</div></li><li><a href=\"/browseshop.phtml?owner=milkt3a&buy_obj_info_id=7461&buy_cost_neopoints=3117\">milkt3a</a><p>4</p><div class='wizard-results-price'>3,117 NP</div></li><li><a href=\"/browseshop.phtml?owner=zaellia&buy_obj_info_id=7461&buy_cost_neopoints=3149\">zaellia</a><p>1</p><div class='wizard-results-price'>3,149 NP</div></li><li><a href=\"/browseshop.phtml?owner=metalmario1337&buy_obj_info_id=7461&buy_cost_neopoints=3199\">metalmario1337</a><p>3</p><div class='wizard-results-price'>3,199 NP</div></li><li><a href=\"/browseshop.phtml?owner=moody2u&buy_obj_info_id=7461&buy_cost_neopoints=3200\">moody2u</a><p>1</p><div class='wizard-results-price'>3,200 NP</div></li><li><a href=\"/browseshop.phtml?owner=mecory95&buy_obj_info_id=7461&buy_cost_neopoints=3239\">mecory95</a><p>4</p><div class='wizard-results-price'>3,239 NP</div></li><li><a href=\"/browseshop.phtml?owner=midoridaydreamer&buy_obj_info_id=7461&buy_cost_neopoints=3241\">midoridaydreamer</a><p>21</p><div class='wizard-results-price'>3,241 NP</div></li><li><a href=\"/browseshop.phtml?owner=magsade&buy_obj_info_id=7461&buy_cost_neopoints=3263\">magsade</a><p>5</p><div class='wizard-results-price'>3,263 NP</div></li><li><a href=\"/browseshop.phtml?owner=mrmarcuz&buy_obj_info_id=7461&buy_cost_neopoints=3325\">mrmarcuz</a><p>7</p><div class='wizard-results-price'>3,325 NP</div></li><li><a href=\"/browseshop.phtml?owner=maplefrog&buy_obj_info_id=7461&buy_cost_neopoints=3333\">maplefrog</a><p>10</p><div class='wizard-results-price'>3,333 NP</div></li><li><a href=\"/browseshop.phtml?owner=mchatin&buy_obj_info_id=7461&buy_cost_neopoints=3333\">mchatin</a><p>19</p><div class='wizard-results-price'>3,333 NP</div></li><li><a href=\"/browseshop.phtml?owner=meika1462&buy_obj_info_id=7461&buy_cost_neopoints=3371\">meika1462</a><p>6</p><div class='wizard-results-price'>3,371 NP</div></li><li><a href=\"/browseshop.phtml?owner=misfit82&buy_obj_info_id=7461&buy_cost_neopoints=3400\">misfit82</a><p>3</p><div class='wizard-results-price'>3,400 NP</div></li><li><a href=\"/browseshop.phtml?owner=moonfaerie666&buy_obj_info_id=7461&buy_cost_neopoints=3400\">moonfaerie666</a><p>26</p><div class='wizard-results-price'>3,400 NP</div></li><li><a href=\"/browseshop.phtml?owner=maxzyll&buy_obj_info_id=7461&buy_cost_neopoints=3428\">maxzyll</a><p>7</p><div class='wizard-results-price'>3,428 NP</div></li><li><a href=\"/browseshop.phtml?owner=myacknin&buy_obj_info_id=7461&buy_cost_neopoints=3431\">myacknin</a><p>1</p><div class='wizard-results-price'>3,431 NP</div></li><li><a href=\"/browseshop.phtml?owner=mariska_1&buy_obj_info_id=7461&buy_cost_neopoints=3445\">mariska_1</a><p>1</p><div class='wizard-results-price'>3,445 NP</div></li></ul></div><div class='button-grid2__2020'><form id='wresultform' method='POST'><input type='hidden' name='type' value='process_wizard'><input type='hidden' name='feedset' value='0'><input type='hidden' name='rs_type' value='Vo Codestone'><input type='hidden' name='rs_min_price' value='1'><input type='hidden' name='rs_max_price' value='999999'><input type='hidden' name='rs_context' value=''><input type='hidden' name='rs_partial' value='exact'><input id='resubmitWizard' class='button-default__2020 button-blue__2020  wizard-button__2020' type='submit' value='Resubmit' data-ajaxgenerated='yes'></form><form action='/shops/wizard.phtml' method='post'><input type=hidden name=table value=\"market_stock\"><input class='button-default__2020 button-blue__2020 wizard-button__2020' type='submit' value='New Search'></form></div>"
+          },
+          "redirectURL": "",
+          "headersSize": 377,
+          "bodySize": 2446
+        },
+        "cache": {},
+        "timings": {
+          "blocked": 0,
+          "dns": 0,
+          "connect": 0,
+          "ssl": 0,
+          "send": 0,
+          "wait": 741,
+          "receive": 0
+        },
+        "time": 741,
+        "_securityState": "secure",
+        "serverIPAddress": "23.205.105.146",
+        "connection": "443",
+        "pageref": "page_1"
+      }
+    ]
+  }
+}
