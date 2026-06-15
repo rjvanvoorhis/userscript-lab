@@ -134,7 +134,7 @@ function main() {
       autobuyEnabled: false,
       autorefreshEnabled: false,
       refreshFrequencyMs: 5000,
-      shopId: '',
+      shopId: param('obj_type') ?? '',
       minProfitMargin: NeoPoint.from(1000),
     });
   }

@@ -39,16 +39,23 @@ export class RestockPageController {
 
   async start(defaults: RestockConfig): Promise<void> {
     const stored = await this.storage.get(STORAGE_KEY) as PersistedConfig | null;
-    const config = stored ? fromPersistedConfig(stored) : defaults;
+    // shopId always comes from the URL (defaults); all other settings restored from storage
+    const config: RestockConfig = stored
+      ? { ...fromPersistedConfig(stored), shopId: defaults.shopId }
+      : defaults;
 
     const shopNames = Object.fromEntries(
       Object.entries(this.shops).map(([id, { name }]) => [id, name]),
     );
 
     this.panel.mount(shopNames, config);
-    this.panel.onConfigChange((next) =>
-      this.storage.set(STORAGE_KEY, toPersistedConfig(next)),
-    );
+    this.panel.onConfigChange(async (next) => {
+      await this.storage.set(STORAGE_KEY, toPersistedConfig(next));
+      if (next.shopId !== config.shopId) {
+        const shop = this.shops[next.shopId];
+        if (shop) await this.navigator.navigateTo(shop.url);
+      }
+    });
 
     await this.run(config);
   }

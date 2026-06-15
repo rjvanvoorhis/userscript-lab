@@ -1,12 +1,12 @@
-import type { Result } from '@core/result';
-import { Ok } from '@core/result';
-import { pool } from '@core/concurrency/pool';
-import type { INavigator } from '@application/shared/INavigator';
-import type { IPriceChecker } from '@application/shared/IPriceChecker';
-import type { IRestockShopScraper } from '@application/Restocker/IRestockShopScraper';
-import type { IRestockBuyer } from '@application/Restocker/IRestockBuyer';
-import type { RestockOpportunity } from '@domain/Restocker/RestockOpportunity';
-import type { NeoPoint } from '@domain/shared/NeoPoint';
+import type { Result } from "@core/result";
+import { Ok } from "@core/result";
+import { pool } from "@core/concurrency/pool";
+import type { INavigator } from "@application/shared/INavigator";
+import type { IPriceChecker } from "@application/shared/IPriceChecker";
+import type { IRestockShopScraper } from "@application/Restocker/IRestockShopScraper";
+import type { IRestockBuyer } from "@application/Restocker/IRestockBuyer";
+import type { RestockOpportunity } from "@domain/Restocker/RestockOpportunity";
+import type { NeoPoint } from "@domain/shared/NeoPoint";
 
 export type ScanConfig = {
   readonly profitThreshold: NeoPoint;
@@ -35,13 +35,13 @@ export class ScanRestockShopUseCase {
     const doc = this.navigator.currentDocument();
     const listingsResult = this.scraper.scrapeListings(doc);
 
-    return listingsResult.chainAsync(async listings => {
+    return listingsResult.chainAsync(async (listings) => {
       const opportunities: RestockOpportunity[] = [];
       let bestItem: BestItem | null = null;
 
       const { results } = await pool(
         listings,
-        async listing => {
+        async (listing) => {
           const priceResult = await this.pricer.getPrice(listing.itemName);
           if (priceResult.isErr()) return null;
           const marketPrice = priceResult.unwrap().price;
@@ -69,7 +69,6 @@ export class ScanRestockShopUseCase {
           await this.buyer.buy(opp.listing);
         }
       }
-
       return Ok.from({ opportunities, bestItem });
     });
   }
